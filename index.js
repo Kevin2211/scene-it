@@ -1,6 +1,7 @@
 
 const card = document.querySelector('.movie');
 const movieContainer = document.querySelector('.movies-container');
+const myForm = document.getElementById('search-form');
 
 function renderMovies(movieArray){
     const movieHTMLArr = movieArray.map((currentMovie) =>{
@@ -20,6 +21,10 @@ function renderMovies(movieArray){
     return movieHTMLArr.join('');
 }
 
-movieContainer.innerHTML = renderMovies(movieData);
 
+
+myForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    movieContainer.innerHTML = renderMovies(movieData);
+})
 
