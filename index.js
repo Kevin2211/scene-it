@@ -4,8 +4,14 @@ const movieContainer = document.querySelector('.movies-container');
 const myForm = document.getElementById('search-form');
 
 function renderMovies(movieArray){
-    const movieHTMLArr = movieArray.map((currentMovie) =>{
-        return `<div class="col movie">
+
+    const movieHTMLArr = [];
+    movieArray.forEach((currentMovie) =>{
+        if(currentMovie.Poster == 'N/A'){
+            currentMovie.Poster = `https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png`;
+        }
+        console.log(currentMovie);
+        const movie = `<div class="col movie">
           <div class="card " style="width: 18rem;">
             <img src="${currentMovie.Poster}" class="card-img-top" alt="...">
             <div class="card-body">
@@ -16,8 +22,10 @@ function renderMovies(movieArray){
             </div>
           </div>
           </div>`
+        movieHTMLArr.push(movie);
+
     })
-        
+    console.log(movieArray)   
     return movieHTMLArr.join('')
 }
 
@@ -33,20 +41,33 @@ function saveToWatchList(ID){
     watchlist.push(movie);
     watchlistJSON = JSON.stringify(watchlist);
     localStorage.setItem('watchlist', watchlistJSON);
-    console.log(watchlist)
 }
 
 
 
-myForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    movieContainer.innerHTML = renderMovies(movieData);
+myForm.addEventListener('submit', async (e) => {
+    try {
+            e.preventDefault();
+    const searchString = document.getElementById('search-bar').value;
+    const urlEncodedSearchString = encodeURIComponent(searchString);
+    const searchquery = await fetch(`http://www.omdbapi.com/?apikey=59354c85&s=${urlEncodedSearchString}`);
+    const searchResult = await searchquery.json();
+    movieData = searchResult.Search;
+    movieContainer.innerHTML = renderMovies(searchResult.Search);
+
+    } catch (error) {
+        console.log(error);
+    }
+
 })
 
 document.addEventListener('click', function(e) {
     if(e.target.classList.contains('add-button')){
         const movieID = e.target.dataset.imdbid;
         saveToWatchList(movieID);
+        e.target.classList.remove('btn-primary');
+        e.target.classList.add('btn-success');
+        e.target.textContent = 'Added!'
     }
     })
 
